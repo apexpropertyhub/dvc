@@ -3,7 +3,7 @@
 /* ---------- 1. Animated view counter ---------- */
 (function () {
   // persist a base view count in localStorage so it grows each visit
-  let views = parseInt(localStorage.getItem("apexViews") || "5040", 10) + 1;
+  let views = parseInt(localStorage.getItem("apexViews") || "500", 10) + 1;
   localStorage.setItem("apexViews", views);
 
   const el = document.getElementById("viewCount");
@@ -140,10 +140,41 @@ document.getElementById("shareForm").addEventListener("submit", (e) => {
 });
 
 /* ---------- 8. Inquiry form ---------- */
+// Paste your Google Apps Script Web App URL here (the .../exec link).
+const INQUIRY_ENDPOINT = "https://script.google.com/macros/s/AKfycbyDXDeU8kvwrcMK86BBlm3krJs3wKJoA8roSOIRAB8_n_L5g2iMjIfxIy85WpKOj3T2Ew/exec";
+
 document.getElementById("inquiryForm").addEventListener("submit", (e) => {
   e.preventDefault();
-  alert("Thank you! Your inquiry has been submitted. We will contact you soon.");
-  e.target.reset();
+
+  const payload = {
+    name: document.getElementById("inqName").value.trim(),
+    phone: document.getElementById("inqPhone").value.trim(),
+    email: document.getElementById("inqEmail").value.trim(),
+    message: document.getElementById("inqMessage").value.trim(),
+  };
+
+  const btn = document.getElementById("inqSubmitBtn");
+  const originalText = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = "Sending…";
+
+  fetch(INQUIRY_ENDPOINT, {
+    method: "POST",
+    // Apps Script web apps don't return CORS headers, so we send as a simple
+    // request. The row is still saved; we just can't read the response body.
+    body: JSON.stringify(payload),
+  })
+    .then(() => {
+      alert("Thank you! Your inquiry has been submitted. We will contact you soon.");
+      e.target.reset();
+    })
+    .catch(() => {
+      alert("Sorry, something went wrong. Please try again later.");
+    })
+    .finally(() => {
+      btn.disabled = false;
+      btn.textContent = originalText;
+    });
 });
 
 /* ---------- 9. Bottom-nav active state on scroll ---------- */
