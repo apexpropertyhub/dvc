@@ -1,5 +1,9 @@
 /* ===== Apex Property Hub — Digital Visiting Card ===== */
 
+/* Google Apps Script Web App URL (the .../exec link) — used for both
+   inquiries and feedback. The script routes by the payload's "form" field. */
+const SHEET_API_URL = "https://script.google.com/macros/s/AKfycbwrBmv4BmDFiL8-0orQJR-9azKeXqJN-ENxWOQgGVVim6JzB3vwCFuhXp1MWL_jkb1HLA/exec";
+
 /* ---------- 1. Animated view counter ---------- */
 (function () {
   // persist a base view count in localStorage so it grows each visit
@@ -65,12 +69,12 @@ galleryColors.forEach((c, i) => {
 });
 
 /* ---------- 4. Feedbacks ---------- */
-const feedbacks = [
-  { name: "Rahul Mehta", date: "Jan 18, 2026", rating: 5, text: "Excellent guidance for commercial office space. Very professional and trustworthy." },
-  { name: "Priya Shah", date: "Feb 02, 2026", rating: 5, text: "Found my dream home with their help. Smooth and transparent dealing." },
-  { name: "Amit Patel", date: "Mar 11, 2026", rating: 4, text: "Good service and quick responses. Highly recommended." },
-  { name: "Nisha Desai", date: "Apr 27, 2026", rating: 5, text: "Very honest team. Given all the guidance for property purchase." },
+// Built-in sample testimonials shown by default. Feedback submitted by
+// visitors is stored in the Google Sheet and loaded on top of these.
+const seedFeedbacks = [
+  
 ];
+let feedbacks = [...seedFeedbacks];
 
 const feedbackList = document.getElementById("feedbackList");
 function starHtml(r) {
@@ -91,7 +95,30 @@ function renderFeedbacks() {
     feedbackList.appendChild(item);
   });
 }
-renderFeedbacks();
+function showFeedbackLoader() {
+  feedbackList.innerHTML = `
+    <div class="feedback-loader">
+      <span class="spinner"></span>
+      <span>Loading feedback…</span>
+    </div>`;
+}
+
+// Load feedback saved by other visitors from the sheet, newest first,
+// and show it above the built-in samples.
+function loadFeedbacks() {
+  showFeedbackLoader();
+  fetch(SHEET_API_URL + "?form=feedback", { cache: "no-store" })
+    .then((r) => r.json())
+    .then((rows) => {
+      if (Array.isArray(rows)) feedbacks = [...rows, ...seedFeedbacks];
+      renderFeedbacks();
+    })
+    .catch(() => {
+      // Show the seed testimonials if the load fails.
+      renderFeedbacks();
+    });
+}
+loadFeedbacks();
 
 /* ---------- 5. Star rating picker ---------- */
 let selectedRating = 0;
@@ -117,12 +144,25 @@ document.getElementById("feedbackForm").addEventListener("submit", (e) => {
   const name = document.getElementById("fbName").value.trim();
   const text = document.getElementById("fbText").value.trim();
   if (!selectedRating) return alert("Please select a rating.");
-  feedbacks.unshift({
+
+  const entry = {
     name,
     date: new Date().toLocaleDateString("en-US", { month: "short", day: "2-digit", year: "numeric" }),
     rating: selectedRating,
     text,
+  };
+
+  // Save to the Google Sheet so every visitor sees it. Tag with form:"feedback"
+  // so the Apps Script routes it to the Feedback tab.
+  fetch(SHEET_API_URL, {
+    method: "POST",
+    body: JSON.stringify({ form: "feedback", ...entry }),
+  }).catch(() => {
+    /* even if the save fails, still show it locally below */
   });
+
+  // Show it immediately for this visitor (it will also load for others on refresh).
+  feedbacks.unshift(entry);
   renderFeedbacks();
   e.target.reset();
   selectedRating = 0;
@@ -140,9 +180,6 @@ document.getElementById("shareForm").addEventListener("submit", (e) => {
 });
 
 /* ---------- 8. Inquiry form ---------- */
-// Paste your Google Apps Script Web App URL here (the .../exec link).
-const INQUIRY_ENDPOINT = "https://script.google.com/macros/s/AKfycbxa8a-a47LSSRxQz9_qQupEtOKF3PEiIeU3ZWCaPNPUVJ6a8YJbikWHlTRjf2FwPsTsHg/exec";
-
 // Category options that depend on the selected Type.
 const inquiryCategories = {
   Buy: ["Commercial", "Residential", "Land"],
@@ -173,6 +210,7 @@ document.getElementById("inquiryForm").addEventListener("submit", (e) => {
   const typeEl = document.querySelector('input[name="inqType"]:checked');
   const categoryEl = document.querySelector('input[name="inqCategory"]:checked');
   const payload = {
+    form: "inquiry",
     name: document.getElementById("inqName").value.trim(),
     phone: document.getElementById("inqPhone").value.trim(),
     email: document.getElementById("inqEmail").value.trim(),
@@ -186,7 +224,7 @@ document.getElementById("inquiryForm").addEventListener("submit", (e) => {
   btn.disabled = true;
   btn.textContent = "Sending…";
 
-  fetch(INQUIRY_ENDPOINT, {
+  fetch(SHEET_API_URL, {
     method: "POST",
     // Apps Script web apps don't return CORS headers, so we send as a simple
     // request. The row is still saved; we just can't read the response body.

@@ -180,6 +180,10 @@ body{
 .feedback-stars{color:#f5b50a;font-size:13px;margin-bottom:4px}
 .feedback-item p.ftext{font-size:14px;color:#444}
 
+.feedback-loader{display:flex;align-items:center;justify-content:center;gap:10px;padding:24px 0;color:var(--muted);font-size:14px}
+.feedback-loader .spinner{width:20px;height:20px;border:3px solid #d6e8f3;border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
 .give-feedback{background:#eef6fb;border-radius:10px;padding:20px;margin-top:18px}
 .give-feedback h3{font-size:16px;font-weight:600;margin-bottom:14px}
 .rating{font-size:22px;color:#f5b50a;margin-bottom:12px;cursor:pointer}
