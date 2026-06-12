@@ -1,0 +1,227 @@
+/* ===== Apex Property Hub — Digital Visiting Card ===== */
+:root{
+  --blue:#1b9dd9;
+  --blue-dark:#1483b8;
+  --teal:#16a394;
+  --ink:#33373d;
+  --muted:#6b7280;
+  --line:#e3e8ee;
+  --bg:#eef2f6;
+  --wave:#4cb6e0;
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Poppins',sans-serif;
+  background:var(--bg);
+  color:var(--ink);
+  display:flex;
+  justify-content:center;
+  padding-bottom:84px;          /* room for bottom nav */
+  -webkit-font-smoothing:antialiased;
+}
+
+/* card column */
+.card{
+  width:100%;
+  max-width:440px;
+  background:#fff;
+  min-height:100vh;
+  box-shadow:0 0 40px rgba(0,0,0,.08);
+}
+
+/* ---- corner brackets ---- */
+.section{position:relative;padding:34px 26px}
+.corner{position:absolute;width:34px;height:34px;border:4px solid var(--blue);z-index:2}
+.corner.tl{top:14px;left:14px;border-right:0;border-bottom:0}
+.corner.tr{top:14px;right:14px;border-left:0;border-bottom:0}
+.corner.bl{bottom:14px;left:14px;border-right:0;border-top:0}
+.corner.br{bottom:14px;right:14px;border-left:0;border-top:0}
+
+.framed{border-bottom:1px solid var(--line)}
+
+/* ============ HOME ============ */
+.home{text-align:center;padding-top:46px}
+.views{
+  display:inline-block;
+  background:var(--wave);
+  color:#fff;
+  font-size:13px;
+  font-weight:500;
+  padding:6px 16px;
+  border-radius:20px;
+  margin-bottom:22px;
+}
+.logo-box{
+  width:190px;height:140px;
+  margin:0 auto 18px;
+  border:1px solid var(--line);
+  border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  padding:14px;
+  background:#fff;
+}
+.logo-box img{max-width:100%;max-height:100%;object-fit:contain}
+
+.company-name{font-size:24px;font-weight:600;color:var(--ink)}
+.title-divider{width:120px;height:3px;background:var(--blue);margin:8px auto 18px;border-radius:3px}
+.person-name{font-size:19px;font-weight:600}
+.person-role{font-style:italic;color:var(--ink);margin-top:2px;font-weight:500}
+
+.action-btns{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;margin:22px 0 8px}
+.pill{
+  display:inline-flex;align-items:center;gap:7px;
+  background:#3b3f45;color:#fff;text-decoration:none;
+  font-size:14px;font-weight:500;
+  padding:11px 20px;border-radius:24px;
+  transition:transform .15s,background .15s;
+}
+.pill:hover{background:var(--blue);transform:translateY(-2px)}
+
+/* wave contact block */
+.contact-wave{
+  position:relative;
+  margin-top:26px;
+  background:var(--wave);
+  color:#fff;
+  border-radius:14px;
+  padding:30px 22px 22px;
+  text-align:left;
+}
+.contact-wave::before{
+  content:"";position:absolute;top:-18px;left:0;right:0;height:20px;
+  background:radial-gradient(circle at 12px -6px,var(--wave) 12px,transparent 13px) repeat-x;
+  background-size:24px 20px;
+}
+.contact-row{display:flex;align-items:flex-start;gap:14px;margin-bottom:16px}
+.contact-row .ic{
+  flex:0 0 38px;height:38px;border-radius:50%;
+  background:rgba(255,255,255,.2);
+  display:flex;align-items:center;justify-content:center;font-size:15px;
+}
+.contact-row p{font-size:14px;line-height:1.5}
+
+.share-form{display:flex;align-items:stretch;gap:8px;margin-top:8px}
+.share-form .cc{
+  background:#fff;color:var(--ink);font-size:14px;font-weight:500;
+  display:flex;align-items:center;padding:0 10px;border-radius:6px 0 0 6px;
+}
+.share-form input{
+  flex:1;border:0;padding:12px;font-size:14px;font-family:inherit;
+  border-radius:0;outline:none;min-width:0;
+}
+.share-form .cc + input{margin-left:-8px;border-radius:0 6px 6px 0}
+.share-form button{
+  background:#41c365;color:#fff;border:0;border-radius:8px;
+  padding:0 14px;font-size:13px;font-weight:500;cursor:pointer;
+  display:flex;align-items:center;gap:6px;white-space:nowrap;
+}
+.share-form button:hover{background:#36a957}
+
+/* ============ section headings ============ */
+.section-title{color:var(--blue);font-size:20px;font-weight:600;margin-bottom:16px}
+.ara{font-weight:600;text-align:center;margin-bottom:18px}
+
+.about-grid p{font-size:14.5px;margin-bottom:8px;display:flex;gap:8px}
+.about-grid strong{min-width:140px;display:inline-block;font-weight:600}
+.sub-head{margin:18px 0 10px;font-weight:600}
+.bullets{list-style:disc;padding-left:22px;margin-bottom:14px}
+.bullets li{font-size:14.5px;margin-bottom:6px}
+.tagline{text-align:center;font-weight:700;font-size:17px;margin-top:18px;line-height:1.4}
+.tagline-sub{text-align:center;font-size:15px;margin-top:4px}
+
+/* ============ brochures ============ */
+.brochure-list{display:flex;flex-direction:column;gap:10px}
+.brochure-item{
+  display:flex;align-items:center;gap:12px;
+  border:1px solid var(--line);border-radius:8px;
+  padding:12px 14px;font-size:14px;
+  transition:box-shadow .15s;
+}
+.brochure-item:hover{box-shadow:0 3px 10px rgba(0,0,0,.07)}
+.brochure-item .fa-file-pdf{color:#e23b3b;font-size:18px}
+.brochure-item .name{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.brochure-item a{color:var(--blue);font-size:18px;text-decoration:none}
+
+/* ============ products ============ */
+.product-card{background:#eef6fb;border-radius:10px;padding:20px}
+.product-card h3{font-size:15px;font-weight:600;margin-bottom:12px}
+.product-card p{font-size:14px;line-height:1.7;text-align:justify;color:#444}
+.hexes{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:20px 0 6px}
+.hex{
+  background:#fff;border:1px solid var(--line);border-radius:8px;
+  padding:14px 16px;font-size:13px;font-weight:500;
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+  min-width:90px;
+}
+.hex i{font-size:22px;color:var(--blue)}
+.hex-foot{text-align:center;font-weight:600;font-size:13px;margin-top:10px;color:var(--teal)}
+.inquiry-link{
+  display:inline-block;margin-top:16px;background:var(--blue);color:#fff;
+  text-decoration:none;padding:8px 22px;border-radius:6px;font-size:14px;
+}
+.inquiry-link:hover{background:var(--blue-dark)}
+
+/* ============ gallery ============ */
+.gallery-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.gallery-grid img{
+  width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px;
+  border:1px solid var(--line);cursor:pointer;transition:transform .15s;
+}
+.gallery-grid img:hover{transform:scale(1.04)}
+
+/* ============ feedbacks ============ */
+.feedback-list{margin-bottom:8px}
+.feedback-item{padding:14px 0;border-bottom:1px solid var(--line)}
+.feedback-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.feedback-head .fname{color:var(--blue);font-weight:500;font-size:15px}
+.feedback-head .fdate{color:var(--muted);font-size:12.5px}
+.feedback-stars{color:#f5b50a;font-size:13px;margin-bottom:4px}
+.feedback-item p.ftext{font-size:14px;color:#444}
+
+.give-feedback{background:#eef6fb;border-radius:10px;padding:20px;margin-top:18px}
+.give-feedback h3{font-size:16px;font-weight:600;margin-bottom:14px}
+.rating{font-size:22px;color:#f5b50a;margin-bottom:12px;cursor:pointer}
+.rating i{margin-right:4px}
+#feedbackForm input,#feedbackForm textarea,
+.inquiry-form input,.inquiry-form textarea{
+  width:100%;border:1px solid var(--line);border-radius:6px;
+  padding:12px;font-size:14px;font-family:inherit;margin-bottom:12px;outline:none;
+}
+#feedbackForm input:focus,#feedbackForm textarea:focus,
+.inquiry-form input:focus,.inquiry-form textarea:focus{border-color:var(--blue)}
+#feedbackForm textarea,.inquiry-form textarea{min-height:80px;resize:vertical}
+#feedbackForm button,.inquiry-form button{
+  background:var(--blue);color:#fff;border:0;border-radius:6px;
+  padding:11px 24px;font-size:14px;font-weight:500;cursor:pointer;
+}
+#feedbackForm button:hover,.inquiry-form button:hover{background:var(--blue-dark)}
+
+/* ============ inquiry ============ */
+.two-col{display:flex;gap:12px}
+.two-col input{flex:1}
+
+.card-footer{text-align:center;font-size:13px;color:var(--muted);padding:18px;background:#eef6fb}
+
+/* ============ bottom nav ============ */
+.bottom-nav{
+  position:fixed;bottom:0;left:0;right:0;
+  background:#fff;border-top:1px solid var(--line);
+  display:flex;justify-content:space-around;
+  box-shadow:0 -3px 14px rgba(0,0,0,.06);
+  z-index:50;
+}
+.nav-item{
+  flex:1;text-decoration:none;color:#9aa3ad;
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  padding:10px 2px;font-size:10px;font-weight:600;letter-spacing:.4px;
+  transition:color .15s;
+}
+.nav-item i{font-size:19px}
+.nav-item.active,.nav-item:hover{color:var(--blue)}
+
+@media(max-width:380px){
+  .pill{padding:10px 16px;font-size:13px}
+  .about-grid strong{min-width:120px}
+}
