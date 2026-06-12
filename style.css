@@ -201,6 +201,10 @@ body{
 /* ============ inquiry ============ */
 .two-col{display:flex;gap:12px}
 .two-col input{flex:1}
+.inquiry-type{display:flex;align-items:center;flex-wrap:wrap;gap:8px 16px;font-size:14px;color:var(--muted);margin:2px 0}
+.inquiry-type-label{font-weight:600;color:inherit}
+.inquiry-type label{display:flex;align-items:center;gap:6px;cursor:pointer}
+.inquiry-type input[type="radio"]{width:auto;margin:0;accent-color:var(--blue)}
 
 .card-footer{text-align:center;font-size:13px;color:var(--muted);padding:18px;background:#eef6fb}
 

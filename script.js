@@ -141,15 +141,43 @@ document.getElementById("shareForm").addEventListener("submit", (e) => {
 
 /* ---------- 8. Inquiry form ---------- */
 // Paste your Google Apps Script Web App URL here (the .../exec link).
-const INQUIRY_ENDPOINT = "https://script.google.com/macros/s/AKfycbyDXDeU8kvwrcMK86BBlm3krJs3wKJoA8roSOIRAB8_n_L5g2iMjIfxIy85WpKOj3T2Ew/exec";
+const INQUIRY_ENDPOINT = "https://script.google.com/macros/s/AKfycbxa8a-a47LSSRxQz9_qQupEtOKF3PEiIeU3ZWCaPNPUVJ6a8YJbikWHlTRjf2FwPsTsHg/exec";
+
+// Category options that depend on the selected Type.
+const inquiryCategories = {
+  Buy: ["Commercial", "Residential", "Land"],
+  Sell: ["Commercial", "Residential", "Land"],
+  Rent: ["Commercial", "Residential"],
+};
+
+const categoryRow = document.getElementById("inqCategoryRow");
+const categoryOptions = document.getElementById("inqCategoryOptions");
+
+// When a Type is chosen, rebuild the Category radios and reveal the row.
+document.querySelectorAll('input[name="inqType"]').forEach((radio) => {
+  radio.addEventListener("change", () => {
+    const options = inquiryCategories[radio.value] || [];
+    categoryOptions.innerHTML = options
+      .map(
+        (c) =>
+          `<label><input type="radio" name="inqCategory" value="${c}" required /> ${c}</label>`
+      )
+      .join("");
+    categoryRow.hidden = false;
+  });
+});
 
 document.getElementById("inquiryForm").addEventListener("submit", (e) => {
   e.preventDefault();
 
+  const typeEl = document.querySelector('input[name="inqType"]:checked');
+  const categoryEl = document.querySelector('input[name="inqCategory"]:checked');
   const payload = {
     name: document.getElementById("inqName").value.trim(),
     phone: document.getElementById("inqPhone").value.trim(),
     email: document.getElementById("inqEmail").value.trim(),
+    type: typeEl ? typeEl.value : "",
+    category: categoryEl ? categoryEl.value : "",
     message: document.getElementById("inqMessage").value.trim(),
   };
 
@@ -167,6 +195,8 @@ document.getElementById("inquiryForm").addEventListener("submit", (e) => {
     .then(() => {
       alert("Thank you! Your inquiry has been submitted. We will contact you soon.");
       e.target.reset();
+      categoryOptions.innerHTML = "";
+      categoryRow.hidden = true;
     })
     .catch(() => {
       alert("Sorry, something went wrong. Please try again later.");

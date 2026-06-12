@@ -187,6 +187,16 @@
           <input type="tel" id="inqPhone" placeholder="Enter Phone Number" required />
           <input type="email" id="inqEmail" placeholder="Enter Email" required />
         </div>
+        <div class="inquiry-type">
+          <span class="inquiry-type-label"></span>
+          <label><input type="radio" name="inqType" value="Buy" required /> Buy</label>
+          <label><input type="radio" name="inqType" value="Sell" /> Sell</label>
+          <label><input type="radio" name="inqType" value="Rent" /> Rent</label>
+        </div>
+        <div class="inquiry-type" id="inqCategoryRow" hidden>
+          <span class="inquiry-type-label"></span>
+          <div id="inqCategoryOptions"></div>
+        </div>
         <textarea id="inqMessage" placeholder="Enter Message"></textarea>
         <button type="submit" id="inqSubmitBtn">Send</button>
       </form>
