@@ -57,16 +57,73 @@ fetch("brochures/brochures.json", { cache: "no-store" })
       `Make sure brochures/brochures.json exists.</p>`;
   });
 
-/* ---------- 3. Gallery (uses placeholder tiles) ---------- */
+/* ---------- 3. Gallery ----------
+   Property photos live in the /gallery folder. To add a new one:
+   1) Drop the image file (jpg/png/webp) into the gallery/ folder.
+   2) Add an entry to gallery/gallery.json  ->  { "title": "...", "file": "yourphoto.jpg" }
+   The grid is built automatically from that manifest. Tapping a photo opens
+   a full-screen lightbox so visitors can view it large. */
 const galleryGrid = document.getElementById("galleryGrid");
-const galleryColors = ["1b9dd9", "16a394", "4cb6e0", "1483b8", "2bb3a3", "5cc0d8", "1b9dd9", "16a394", "4cb6e0"];
-galleryColors.forEach((c, i) => {
-  const img = document.createElement("img");
-  img.src = `https://placehold.co/300x300/${c}/ffffff?text=Project+${i + 1}`;
-  img.alt = `Gallery image ${i + 1}`;
-  img.loading = "lazy";
-  galleryGrid.appendChild(img);
+
+// --- Lightbox: built once, reused for every photo ---
+const lightbox = document.createElement("div");
+lightbox.className = "lightbox";
+lightbox.innerHTML = `
+  <span class="lightbox-close" aria-label="Close">&times;</span>
+  <img class="lightbox-img" alt="" />
+  <p class="lightbox-caption"></p>`;
+document.body.appendChild(lightbox);
+const lightboxImg = lightbox.querySelector(".lightbox-img");
+const lightboxCaption = lightbox.querySelector(".lightbox-caption");
+
+function openLightbox(src, title) {
+  lightboxImg.src = src;
+  lightboxImg.alt = title || "";
+  lightboxCaption.textContent = title || "";
+  lightbox.classList.add("open");
+  document.body.style.overflow = "hidden"; // stop background scroll
+}
+function closeLightbox() {
+  lightbox.classList.remove("open");
+  document.body.style.overflow = "";
+  lightboxImg.src = "";
+}
+lightbox.addEventListener("click", (e) => {
+  // close when clicking the backdrop or the × (but not the image itself)
+  if (e.target === lightbox || e.target.classList.contains("lightbox-close")) {
+    closeLightbox();
+  }
 });
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") closeLightbox();
+});
+
+function renderGallery(items) {
+  galleryGrid.innerHTML = "";
+  if (!items.length) {
+    galleryGrid.innerHTML = `<p style="font-size:14px;color:#6b7280">No photos available yet.</p>`;
+    return;
+  }
+  items.forEach(({ title, file }) => {
+    const url = "gallery/" + file;
+    const img = document.createElement("img");
+    img.src = url;
+    img.alt = title || "Property photo";
+    img.title = title || "";
+    img.loading = "lazy";
+    img.addEventListener("click", () => openLightbox(url, title));
+    galleryGrid.appendChild(img);
+  });
+}
+
+fetch("gallery/gallery.json", { cache: "no-store" })
+  .then((r) => (r.ok ? r.json() : Promise.reject()))
+  .then(renderGallery)
+  .catch(() => {
+    galleryGrid.innerHTML =
+      `<p style="font-size:14px;color:#6b7280">Could not load photos. ` +
+      `Make sure gallery/gallery.json exists.</p>`;
+  });
 
 /* ---------- 4. Feedbacks ---------- */
 // Built-in sample testimonials shown by default. Feedback submitted by

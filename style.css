@@ -171,6 +171,24 @@ body{
 }
 .gallery-grid img:hover{transform:scale(1.04)}
 
+/* ---- gallery lightbox ---- */
+.lightbox{
+  position:fixed;inset:0;z-index:1000;display:none;
+  align-items:center;justify-content:center;flex-direction:column;gap:14px;
+  background:rgba(0,0,0,.88);padding:24px;
+}
+.lightbox.open{display:flex}
+.lightbox-img{
+  max-width:92vw;max-height:80vh;object-fit:contain;border-radius:8px;
+  box-shadow:0 10px 40px rgba(0,0,0,.5);
+}
+.lightbox-caption{color:#fff;font-size:14px;text-align:center;margin:0;max-width:90vw}
+.lightbox-close{
+  position:absolute;top:16px;right:22px;color:#fff;font-size:38px;line-height:1;
+  cursor:pointer;font-weight:300;user-select:none;
+}
+.lightbox-close:hover{color:var(--blue)}
+
 /* ============ feedbacks ============ */
 .feedback-list{margin-bottom:8px}
 .feedback-item{padding:14px 0;border-bottom:1px solid var(--line)}
