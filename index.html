@@ -20,6 +20,14 @@
   <meta name="twitter:image" content="https://apexpropertyhub.github.io/dvc/images/logo.jpeg" />
 
   <link rel="icon" href="images/logo.svg" />
+
+  <!-- PWA (Add to Home Screen) -->
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#1b9dd9" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="Apex Property Hub" />
+  <link rel="apple-touch-icon" href="images/logo.jpeg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
@@ -114,6 +122,13 @@
           <button type="submit"><i class="fa-brands fa-whatsapp"></i> Share on Whatsapp</button>
         </form>
 
+        <!-- Social media. Replace the href="#" values with your real profile URLs. -->
+        <div class="socials">
+          <a href="https://www.instagram.com/apex_property_hub?igsh=MXNxMTBkc2ZndXFzZw==" target="_blank" rel="noopener" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+          <a href="#" target="_blank" rel="noopener" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+          <!--<a href="#" target="_blank" rel="noopener" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
+          <a href="#" target="_blank" rel="noopener" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>-->
+        </div>
       </div>
     </section>
 
@@ -196,6 +211,17 @@
       <span class="corner bl"></span><span class="corner br"></span>
 
       <h2 class="section-title">FEATURED PROPERTIES</h2>
+
+      <div class="property-filters" id="propertyFilters">
+        <button type="button" class="filter-btn active" data-filter="all">All</button>
+        <button type="button" class="filter-btn" data-filter="Buy">Buy</button>
+        <button type="button" class="filter-btn" data-filter="Sell">Sell</button>
+        <button type="button" class="filter-btn" data-filter="Rent">Rent</button>
+        <button type="button" class="filter-btn" data-filter="Residential">Residential</button>
+        <button type="button" class="filter-btn" data-filter="Commercial">Commercial</button>
+        <button type="button" class="filter-btn" data-filter="Land">Land</button>
+      </div>
+
       <div class="property-list" id="propertyList">
         <!-- filled by JS -->
       </div>
@@ -249,7 +275,7 @@
         <input type="text" id="inqName" placeholder="Enter Full Name" required />
         <div class="two-col">
           <input type="tel" id="inqPhone" placeholder="Enter Phone Number" required />
-          <input type="email" id="inqEmail" placeholder="Enter Email" required />
+          <input type="email" id="inqEmail" placeholder="Enter Email (optional)" />
         </div>
         <div class="inquiry-type">
           <span class="inquiry-type-label"></span>
@@ -268,6 +294,12 @@
 
     <footer class="card-footer">© 2026 Apex Property Hub</footer>
   </main>
+
+  <!-- Floating WhatsApp contact button -->
+  <a href="https://wa.me/918460205711?text=Hi%2C%20I%20found%20your%20digital%20card%20and%20would%20like%20to%20know%20more."
+     class="wa-float" target="_blank" rel="noopener" aria-label="Chat on WhatsApp">
+    <i class="fa-brands fa-whatsapp"></i>
+  </a>
 
   <!-- ============ BOTTOM NAV ============ -->
   <nav class="bottom-nav">

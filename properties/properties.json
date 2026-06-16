@@ -5,7 +5,7 @@
     "size": "968.76 sq.ft.",
     "price": "₹ 74 Lacs",
     "photo": "shivali.png",
-    "type": "Buy",
+    "type": "Sell",
     "category": "Residential"
   },
   {
@@ -14,7 +14,7 @@
     "size": "1333 sq.ft.",
     "price": "₹ 1 cr++ ",
     "photo": "brillia.png",
-    "type": "Buy",
+    "type": "Sell",
     "category": "Commercial"
   }
 ]

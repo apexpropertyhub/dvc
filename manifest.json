@@ -1,0 +1,18 @@
+{
+  "name": "Apex Property Hub",
+  "short_name": "Apex Property",
+  "description": "Apex Property Hub — Real Estate Consultant in Ahmedabad. Buy, Sell, Rent, Invest.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1b9dd9",
+  "icons": [
+    {
+      "src": "images/logo.jpeg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    }
+  ]
+}

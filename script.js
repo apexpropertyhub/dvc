@@ -184,22 +184,33 @@ const propertyList = document.getElementById("propertyList");
 const PROPERTIES_PER_PAGE = 5;
 let allProperties = [];
 let propertyPage = 1;
+let propertyFilter = "all"; // "all" | Buy | Sell | Rent | Residential | Commercial | Land
 
 // Pagination controls, inserted right after the list.
 const propertyPagination = document.createElement("div");
 propertyPagination.className = "pagination";
 propertyList.insertAdjacentElement("afterend", propertyPagination);
 
+// Properties matching the active filter (matches either type or category).
+function filteredProperties() {
+  if (propertyFilter === "all") return allProperties;
+  return allProperties.filter(
+    (p) => p.type === propertyFilter || p.category === propertyFilter
+  );
+}
+
 function renderProperties() {
   propertyList.innerHTML = "";
-  if (!allProperties.length) {
-    propertyList.innerHTML = `<p style="font-size:14px;color:#6b7280">No properties listed yet.</p>`;
+  const items = filteredProperties();
+  if (!items.length) {
+    const msg = allProperties.length ? "No properties match this filter." : "No properties listed yet.";
+    propertyList.innerHTML = `<p style="font-size:14px;color:#6b7280">${msg}</p>`;
     propertyPagination.innerHTML = "";
     return;
   }
 
   const start = (propertyPage - 1) * PROPERTIES_PER_PAGE;
-  allProperties.slice(start, start + PROPERTIES_PER_PAGE).forEach(({ title, location, size, price, photo, type, category }) => {
+  items.slice(start, start + PROPERTIES_PER_PAGE).forEach(({ title, location, size, price, photo, type, category }) => {
     const url = photo ? "properties/" + photo : "";
     const card = document.createElement("div");
     card.className = "property-card";
@@ -245,7 +256,7 @@ function renderProperties() {
 }
 
 function renderPropertyPagination() {
-  const pageCount = Math.ceil(allProperties.length / PROPERTIES_PER_PAGE);
+  const pageCount = Math.ceil(filteredProperties().length / PROPERTIES_PER_PAGE);
   propertyPagination.innerHTML = "";
   if (pageCount <= 1) return;
 
@@ -275,6 +286,17 @@ function renderPropertyPagination() {
     makeBtn('<i class="fa-solid fa-angle-right"></i>', propertyPage + 1, { disabled: propertyPage === pageCount })
   );
 }
+
+// Filter buttons: pick a filter, reset to page 1, re-render.
+document.querySelectorAll("#propertyFilters .filter-btn").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll("#propertyFilters .filter-btn").forEach((b) => b.classList.remove("active"));
+    btn.classList.add("active");
+    propertyFilter = btn.dataset.filter;
+    propertyPage = 1;
+    renderProperties();
+  });
+});
 
 fetch("properties/properties.json", { cache: "no-store" })
   .then((r) => (r.ok ? r.json() : Promise.reject()))
@@ -581,3 +603,12 @@ const observer = new IntersectionObserver(
     const sec = document.getElementById(id);
     if (sec) observer.observe(sec);
   });
+
+/* ---------- 10. PWA service worker (Add to Home Screen) ---------- */
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("sw.js").catch(() => {
+      /* registration fails silently on unsupported / file:// contexts */
+    });
+  });
+}
