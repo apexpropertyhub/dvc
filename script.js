@@ -6,9 +6,9 @@ const SHEET_API_URL = "https://script.google.com/macros/s/AKfycbwrBmv4BmDFiL8-0o
 
 /* ---------- 1. Animated view counter ---------- */
 (function () {
-  // persist a base view count in localStorage so it grows each visit
-  let views = parseInt(localStorage.getItem("apexViews") || "500", 10) + 1;
-  localStorage.setItem("apexViews", views);
+  // persist a view count in localStorage so it grows each visit (starts at 0)
+  let views = parseInt(localStorage.getItem("apexViews_v2") || "0", 10) + 1;
+  localStorage.setItem("apexViews_v2", views);
 
   const el = document.getElementById("viewCount");
   let n = Math.max(0, views - 120);
@@ -27,14 +27,25 @@ const SHEET_API_URL = "https://script.google.com/macros/s/AKfycbwrBmv4BmDFiL8-0o
    2) Add an entry to brochures/brochures.json  ->  { "title": "...", "file": "yourfile.pdf" }
    The list below is built automatically from that manifest, and works on GitHub Pages. */
 const brochureList = document.getElementById("brochureList");
+const BROCHURES_PER_PAGE = 5;
+let allBrochures = [];
+let brochurePage = 1;
 
-function renderBrochures(items) {
+// Pagination controls, inserted right after the list.
+const brochurePagination = document.createElement("div");
+brochurePagination.className = "pagination";
+brochureList.insertAdjacentElement("afterend", brochurePagination);
+
+function renderBrochures() {
   brochureList.innerHTML = "";
-  if (!items.length) {
+  if (!allBrochures.length) {
     brochureList.innerHTML = `<p style="font-size:14px;color:#6b7280">No brochures available yet.</p>`;
+    brochurePagination.innerHTML = "";
     return;
   }
-  items.forEach(({ title, file }) => {
+
+  const start = (brochurePage - 1) * BROCHURES_PER_PAGE;
+  allBrochures.slice(start, start + BROCHURES_PER_PAGE).forEach(({ title, file }) => {
     const url = "brochures/" + file;
     const row = document.createElement("div");
     row.className = "brochure-item";
@@ -46,11 +57,49 @@ function renderBrochures(items) {
       </a>`;
     brochureList.appendChild(row);
   });
+
+  renderBrochurePagination();
+}
+
+function renderBrochurePagination() {
+  const pageCount = Math.ceil(allBrochures.length / BROCHURES_PER_PAGE);
+  brochurePagination.innerHTML = "";
+  if (pageCount <= 1) return;
+
+  const makeBtn = (label, page, opts = {}) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "page-btn" + (opts.active ? " active" : "");
+    b.innerHTML = label;
+    b.disabled = !!opts.disabled;
+    if (!opts.disabled && !opts.active) {
+      b.addEventListener("click", () => {
+        brochurePage = page;
+        renderBrochures();
+        document.getElementById("brochureList").scrollIntoView({ behavior: "smooth", block: "nearest" });
+      });
+    }
+    return b;
+  };
+
+  brochurePagination.appendChild(
+    makeBtn('<i class="fa-solid fa-angle-left"></i>', brochurePage - 1, { disabled: brochurePage === 1 })
+  );
+  for (let p = 1; p <= pageCount; p++) {
+    brochurePagination.appendChild(makeBtn(String(p), p, { active: p === brochurePage }));
+  }
+  brochurePagination.appendChild(
+    makeBtn('<i class="fa-solid fa-angle-right"></i>', brochurePage + 1, { disabled: brochurePage === pageCount })
+  );
 }
 
 fetch("brochures/brochures.json", { cache: "no-store" })
   .then((r) => (r.ok ? r.json() : Promise.reject()))
-  .then(renderBrochures)
+  .then((items) => {
+    allBrochures = Array.isArray(items) ? items : [];
+    brochurePage = 1;
+    renderBrochures();
+  })
   .catch(() => {
     brochureList.innerHTML =
       `<p style="font-size:14px;color:#6b7280">Could not load brochures. ` +
@@ -125,6 +174,163 @@ fetch("gallery/gallery.json", { cache: "no-store" })
       `Make sure gallery/gallery.json exists.</p>`;
   });
 
+/* ---------- 3b. Featured properties ----------
+   Listings live in properties/properties.json. To add one:
+   1) Drop the photo into the properties/ folder.
+   2) Add an entry:
+      { "title": "...", "location": "...", "price": "...", "photo": "file.jpg" }
+   Tapping the photo opens it in the same lightbox; "Enquire" jumps to the form. */
+const propertyList = document.getElementById("propertyList");
+const PROPERTIES_PER_PAGE = 5;
+let allProperties = [];
+let propertyPage = 1;
+
+// Pagination controls, inserted right after the list.
+const propertyPagination = document.createElement("div");
+propertyPagination.className = "pagination";
+propertyList.insertAdjacentElement("afterend", propertyPagination);
+
+function renderProperties() {
+  propertyList.innerHTML = "";
+  if (!allProperties.length) {
+    propertyList.innerHTML = `<p style="font-size:14px;color:#6b7280">No properties listed yet.</p>`;
+    propertyPagination.innerHTML = "";
+    return;
+  }
+
+  const start = (propertyPage - 1) * PROPERTIES_PER_PAGE;
+  allProperties.slice(start, start + PROPERTIES_PER_PAGE).forEach(({ title, location, size, price, photo, type, category }) => {
+    const url = photo ? "properties/" + photo : "";
+    const card = document.createElement("div");
+    card.className = "property-card";
+    card.innerHTML = `
+      ${url ? `<img class="property-photo" src="${url}" alt="${title || "Property"}" loading="lazy" />` : ""}
+      <div class="property-info">
+        <h3 class="property-title">${title || ""}</h3>
+        ${location ? `<p class="property-loc"><i class="fa-solid fa-location-dot"></i> ${location}</p>` : ""}
+        ${size ? `<p class="property-size"><i class="fa-solid fa-ruler-combined"></i> ${size}</p>` : ""}
+        ${price ? `<p class="property-price">${price}</p>` : ""}
+        <a href="#enquiry-section" class="property-enquire">Enquire</a>
+      </div>`;
+    if (url) {
+      card.querySelector(".property-photo").addEventListener("click", () => openLightbox(url, title));
+    }
+
+    // Enquire: prefill the inquiry form (message + Type/Category), then let
+    // the link scroll down to the form so the visitor adds the rest.
+    card.querySelector(".property-enquire").addEventListener("click", () => {
+      const msg = document.getElementById("inqMessage");
+      if (msg) {
+        const parts = [title, location].filter(Boolean).join(", ");
+        msg.value = `I am interested in this property: ${parts}. Please share more details.`;
+      }
+
+      // Auto-select Type (defaults to "Buy"), which builds the Category radios.
+      const typeVal = type || "Buy";
+      const typeRadio = document.querySelector(`input[name="inqType"][value="${typeVal}"]`);
+      if (typeRadio) {
+        typeRadio.checked = true;
+        typeRadio.dispatchEvent(new Event("change")); // rebuilds + reveals categories
+        if (category) {
+          const catRadio = document.querySelector(`input[name="inqCategory"][value="${category}"]`);
+          if (catRadio) catRadio.checked = true;
+        }
+      }
+    });
+
+    propertyList.appendChild(card);
+  });
+
+  renderPropertyPagination();
+}
+
+function renderPropertyPagination() {
+  const pageCount = Math.ceil(allProperties.length / PROPERTIES_PER_PAGE);
+  propertyPagination.innerHTML = "";
+  if (pageCount <= 1) return;
+
+  const makeBtn = (label, page, opts = {}) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "page-btn" + (opts.active ? " active" : "");
+    b.innerHTML = label;
+    b.disabled = !!opts.disabled;
+    if (!opts.disabled && !opts.active) {
+      b.addEventListener("click", () => {
+        propertyPage = page;
+        renderProperties();
+        document.getElementById("propertyList").scrollIntoView({ behavior: "smooth", block: "nearest" });
+      });
+    }
+    return b;
+  };
+
+  propertyPagination.appendChild(
+    makeBtn('<i class="fa-solid fa-angle-left"></i>', propertyPage - 1, { disabled: propertyPage === 1 })
+  );
+  for (let p = 1; p <= pageCount; p++) {
+    propertyPagination.appendChild(makeBtn(String(p), p, { active: p === propertyPage }));
+  }
+  propertyPagination.appendChild(
+    makeBtn('<i class="fa-solid fa-angle-right"></i>', propertyPage + 1, { disabled: propertyPage === pageCount })
+  );
+}
+
+fetch("properties/properties.json", { cache: "no-store" })
+  .then((r) => (r.ok ? r.json() : Promise.reject()))
+  .then((items) => {
+    allProperties = Array.isArray(items) ? items : [];
+    propertyPage = 1;
+    renderProperties();
+  })
+  .catch(() => {
+    propertyList.innerHTML =
+      `<p style="font-size:14px;color:#6b7280">Could not load properties. ` +
+      `Make sure properties/properties.json exists.</p>`;
+  });
+
+/* ---------- 3c. Save Contact (vCard) per person ---------- */
+// Build a .vcf for one person, tagged with the company so it saves under
+// their own name on the visitor's phone.
+function buildVCard({ name, role, phone }) {
+  return [
+    "BEGIN:VCARD",
+    "VERSION:3.0",
+    "N:" + name + ";;;;",
+    "FN:" + name,
+    "ORG:Apex Property Hub",
+    "TITLE:" + (role || ""),
+    "TEL;TYPE=CELL:" + phone,
+    "EMAIL:apexpropertyhub1@gmail.com",
+    "ADR;TYPE=WORK:;;B-405 Time Square 2, Near Avlon Hotel, Thaltej;Ahmedabad;Gujarat;380054;India",
+    "URL:https://apexpropertyhub.github.io/dvc/",
+    "END:VCARD",
+  ].join("\r\n");
+}
+
+function downloadVCard(person) {
+  const blob = new Blob([buildVCard(person)], { type: "text/vcard;charset=utf-8" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = person.name.replace(/\s+/g, "-") + ".vcf";
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(link.href);
+}
+
+// Wire up every per-person "Save Contact" button using its row's data-* values.
+document.querySelectorAll(".person .save-contact-btn").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const row = btn.closest(".person");
+    downloadVCard({
+      name: row.dataset.name,
+      role: row.dataset.role,
+      phone: row.dataset.phone,
+    });
+  });
+});
+
 /* ---------- 4. Feedbacks ---------- */
 // Built-in sample testimonials shown by default. Feedback submitted by
 // visitors is stored in the Google Sheet and loaded on top of these.
@@ -134,12 +340,27 @@ const seedFeedbacks = [
 let feedbacks = [...seedFeedbacks];
 
 const feedbackList = document.getElementById("feedbackList");
+const FEEDBACKS_PER_PAGE = 5;
+let feedbackPage = 1;
+
+// Pagination controls, inserted right after the list.
+const feedbackPagination = document.createElement("div");
+feedbackPagination.className = "pagination";
+feedbackList.insertAdjacentElement("afterend", feedbackPagination);
+
 function starHtml(r) {
   return "★".repeat(r) + "☆".repeat(5 - r);
 }
 function renderFeedbacks() {
   feedbackList.innerHTML = "";
-  feedbacks.forEach((f) => {
+  if (!feedbacks.length) {
+    feedbackList.innerHTML = `<p style="font-size:14px;color:#6b7280">No feedback yet. Be the first to share!</p>`;
+    feedbackPagination.innerHTML = "";
+    return;
+  }
+
+  const start = (feedbackPage - 1) * FEEDBACKS_PER_PAGE;
+  feedbacks.slice(start, start + FEEDBACKS_PER_PAGE).forEach((f) => {
     const item = document.createElement("div");
     item.className = "feedback-item";
     item.innerHTML = `
@@ -151,13 +372,49 @@ function renderFeedbacks() {
       <p class="ftext">${f.text}</p>`;
     feedbackList.appendChild(item);
   });
+
+  renderFeedbackPagination();
 }
+
+function renderFeedbackPagination() {
+  const pageCount = Math.ceil(feedbacks.length / FEEDBACKS_PER_PAGE);
+  feedbackPagination.innerHTML = "";
+  if (pageCount <= 1) return;
+
+  const makeBtn = (label, page, opts = {}) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "page-btn" + (opts.active ? " active" : "");
+    b.innerHTML = label;
+    b.disabled = !!opts.disabled;
+    if (!opts.disabled && !opts.active) {
+      b.addEventListener("click", () => {
+        feedbackPage = page;
+        renderFeedbacks();
+        feedbackList.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      });
+    }
+    return b;
+  };
+
+  feedbackPagination.appendChild(
+    makeBtn('<i class="fa-solid fa-angle-left"></i>', feedbackPage - 1, { disabled: feedbackPage === 1 })
+  );
+  for (let p = 1; p <= pageCount; p++) {
+    feedbackPagination.appendChild(makeBtn(String(p), p, { active: p === feedbackPage }));
+  }
+  feedbackPagination.appendChild(
+    makeBtn('<i class="fa-solid fa-angle-right"></i>', feedbackPage + 1, { disabled: feedbackPage === pageCount })
+  );
+}
+
 function showFeedbackLoader() {
   feedbackList.innerHTML = `
     <div class="feedback-loader">
       <span class="spinner"></span>
       <span>Loading feedback…</span>
     </div>`;
+  feedbackPagination.innerHTML = "";
 }
 
 // Load feedback saved by other visitors from the sheet, newest first,
@@ -220,6 +477,7 @@ document.getElementById("feedbackForm").addEventListener("submit", (e) => {
 
   // Show it immediately for this visitor (it will also load for others on refresh).
   feedbacks.unshift(entry);
+  feedbackPage = 1; // jump to first page so the new feedback is visible
   renderFeedbacks();
   e.target.reset();
   selectedRating = 0;
@@ -318,7 +576,7 @@ const observer = new IntersectionObserver(
   },
   { rootMargin: "-45% 0px -45% 0px" }
 );
-["home-section", "about-us-section", "products-services-section", "gallery-section", "feedback-section", "enquiry-section"]
+["home-section", "about-us-section", "products-services-section", "properties-section", "gallery-section", "feedback-section", "enquiry-section"]
   .forEach((id) => {
     const sec = document.getElementById(id);
     if (sec) observer.observe(sec);

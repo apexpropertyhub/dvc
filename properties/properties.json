@@ -1,0 +1,20 @@
+[
+  {
+    "title": "3 BHK Flat",
+    "location": "Nana Chiloda, Ahmedabad",
+    "size": "968.76 sq.ft.",
+    "price": "₹ 74 Lacs",
+    "photo": "shivali.png",
+    "type": "Buy",
+    "category": "Residential"
+  },
+  {
+    "title": "Commercial Office Space",
+    "location": "SG Highway, Ahmedabad",
+    "size": "1333 sq.ft.",
+    "price": "₹ 1 cr++ ",
+    "photo": "brillia.png",
+    "type": "Buy",
+    "category": "Commercial"
+  }
+]
